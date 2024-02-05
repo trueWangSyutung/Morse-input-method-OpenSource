@@ -69,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:text="隐私协议"
+                    android:text="@string/privacy_policy"
                     android:textSize="20dp"
                     android:textColor="@color/black"
                     />
@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:text="用户协议"
+                    android:text="@string/user_agreement"
                     android:textSize="20dp"
                     android:textColor="@color/black"
                     />
@@ -110,6 +110,7 @@
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/open_source"
+                android:layout_marginBottom="10dp"
 
                 android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
@@ -122,7 +123,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:text="开源许可"
+                    android:text="@string/open_source"
+                    android:textSize="20dp"
+                    android:textColor="@color/black"
+                    />
+
+
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/github_repo"
+
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:text="@string/github_repo"
                     android:textSize="20dp"
                     android:textColor="@color/black"
                     />

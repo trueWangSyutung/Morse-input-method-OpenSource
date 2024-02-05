@@ -8,6 +8,9 @@
     <string name="qiyong">启用输入法</string>
     <string name="act">請先啟動並啟用輸入法</string>
     <string name="input">你可以在這裡嘗試使用一下輸入法</string>
-    <string name="local">中華人民共和國·河南</string>
     <string name="local_my">中華人民共和國·河南</string>
+    <string name="privacy_policy">隱私協議</string>
+    <string name="user_agreement">用戶協議</string>
+    <string name="open_source">開源許可</string>
+    <string name="github_repo">GitHub 倉庫</string>
 </resources>

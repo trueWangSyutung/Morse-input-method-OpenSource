@@ -44,7 +44,8 @@ class MorseInputService : InputMethodService()
     var settings: ImageButton? = null
     var help : ImageButton? = null
     var isSound = true
-
+    var inputCode : TextView? = null
+    var chineseCode : TextView? = null
     @SuppressLint("UseCompatLoadingForDrawables")
     fun initMorseCode(){
         // 初始化莫尔斯代码 表 a-z，0-9，, . ? ! : ; = - _ " ( ) $ & @
@@ -203,7 +204,8 @@ class MorseInputService : InputMethodService()
 
             // 清空输入框
             inputString = ""
-
+            inputCode!!.text = ""
+            chineseCode!!.text = ""
         }
         // 设置 layout_weight
         val layoutParams = LinearLayout.LayoutParams( LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
@@ -239,6 +241,7 @@ class MorseInputService : InputMethodService()
 
         settings = keyboardView!!.findViewById(R.id.settings)
         help = keyboardView!!.findViewById(R.id.help)
+        inputCode = keyboardView!!.findViewById(R.id.inputCode)
 
         // 读取 shared preference 中的设置
         val sharedPref = getSharedPreferences("settings", MODE_PRIVATE)
@@ -263,6 +266,7 @@ class MorseInputService : InputMethodService()
 
             startActivity(intent)
         }
+        chineseCode = keyboardView!!.findViewById(R.id.chineseCode)
 
         if (isDarkMode) {
             // 如果是深色模式，我们需要修改键盘的背景颜色
@@ -274,6 +278,9 @@ class MorseInputService : InputMethodService()
             keyboardView!!.findViewById<LinearLayout>(R.id.keyBar).setBackgroundResource(R.drawable.background_dark)
             keyboardView!!.findViewById<LinearLayout>(R.id.lau_container).setBackgroundResource(R.drawable.newtext_background_dark)
             // 修改键盘的按键颜色
+            inputCode!!.setTextColor(resources.getColor(R.color.button_text_dark))
+            chineseCode!!.setTextColor(resources.getColor(R.color.button_text_dark))
+
 
             dots.setBackgroundResource(R.drawable.key_background_dark)
             lines.setBackgroundResource(R.drawable.key_background_dark)
@@ -319,18 +326,21 @@ class MorseInputService : InputMethodService()
             // 清空临时变量
             inputString = ""
             chineseInput = ""
-
-
+            chineseCode!!.text = ""
+            inputCode!!.text = ""
 
             if (imputMode == 0) {
                 imputMode = 1
+                chineseCode!!.visibility = View.VISIBLE
                 if (isDarkMode) {
                     lauBtn!!.setBackgroundResource(R.mipmap.chinses_dark)
+
                 }else{
                     lauBtn!!.setBackgroundResource(R.mipmap.chinses_light)
                 }
             }else{
                 imputMode = 0
+                chineseCode!!.visibility = View.GONE
                 if (isDarkMode) {
                     lauBtn!!.setBackgroundResource(R.mipmap.english_dark)
                 }else{
@@ -362,6 +372,7 @@ class MorseInputService : InputMethodService()
             }
 
             println("imputMode: " + imputMode)
+            inputCode!!.text = morseCode
             if (imputMode == 0) {
                 // 英文输入法
 
@@ -371,6 +382,8 @@ class MorseInputService : InputMethodService()
 
                     if (input.length > 6) {
                         inputString = ""
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
@@ -384,6 +397,8 @@ class MorseInputService : InputMethodService()
                     // 如果长度超过 6，清空
                     if (input.length > 6) {
                         inputString = ""
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
@@ -392,6 +407,8 @@ class MorseInputService : InputMethodService()
                 } else {
                     if (input.length > 6) {
                         inputString = ""
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
@@ -400,15 +417,25 @@ class MorseInputService : InputMethodService()
             }
             else if (imputMode == 1) {
                 // 中文输入法
+                if (input.length > 6) {
+                    inputString = ""
+                    hideHouxuan()
+                    chineseCode!!.text = ""
+                    inputCode!!.text = ""
+                }else{
+                    inputString = morseCode
+                }
                if (result!="" && result!=null) {
                    // 如果 result 仅是 数字，则查询对应的中文
 
                      if (result in "0".."9") {
-                         inputString = morseCode
 
                          chineseInput += result
+                         chineseCode!!.text = chineseInput
+
                             getChineseMorse(chineseInput)
                          inputString = ""
+                         inputCode!!.text = ""
 
                      }else {
                          // 将 字符串 直接 输出
@@ -421,6 +448,8 @@ class MorseInputService : InputMethodService()
                }else{
                      if (input.length > 6) {
                           inputString = ""
+                         chineseCode!!.text = ""
+                         inputCode!!.text = ""
                      }else{
                           inputString = morseCode
 
@@ -451,6 +480,7 @@ class MorseInputService : InputMethodService()
                 mediaPlayer.prepare()
                 mediaPlayer.start()
             }
+            inputCode!!.text = morseCode
 
             if (imputMode == 0) {
                 // 英文输入法
@@ -469,7 +499,8 @@ class MorseInputService : InputMethodService()
                     if (input.length > 6) {
                         inputString = ""
                         hideHouxuan()
-
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
@@ -479,6 +510,8 @@ class MorseInputService : InputMethodService()
                     if (input.length > 6) {
                         inputString = ""
                         hideHouxuan()
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
@@ -492,16 +525,20 @@ class MorseInputService : InputMethodService()
                     if (input.length > 6) {
                         inputString = ""
                         hideHouxuan()
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
                     }
                     if (result in "0".."9") {
                         chineseInput += result
+                        chineseCode!!.text = chineseInput
+
                         getChineseMorse(chineseInput)
                         // 清空input
                         inputString = ""
-
+                        inputCode!!.text = ""
 
                     }else {
                         // 将 字符串 直接 输出
@@ -515,6 +552,8 @@ class MorseInputService : InputMethodService()
                     if (input.length > 6) {
                         inputString = ""
                         hideHouxuan()
+                        chineseCode!!.text = ""
+                        inputCode!!.text = ""
                     }else{
                         inputString = morseCode
 
@@ -579,6 +618,8 @@ class MorseInputService : InputMethodService()
             hideHouxuan()
             // 清空输入框
             inputString = ""
+            inputCode!!.text = ""
+            chineseCode!!.text = ""
 
         }
         // 添加到 LinearLayout

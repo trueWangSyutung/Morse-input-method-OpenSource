@@ -20,6 +20,9 @@
         android:theme="@style/Theme.MorseInputMethod"
         tools:targetApi="31">
         <activity
+            android:name=".view.OpenSourceLicenseActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.WebActivity"
             android:exported="false" />
         <activity

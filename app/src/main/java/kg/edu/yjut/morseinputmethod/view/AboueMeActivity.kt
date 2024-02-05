@@ -50,10 +50,20 @@ class AboueMeActivity : AppCompatActivity() {
         var open_source = findViewById<LinearLayout>(R.id.open_source)
         open_source.setOnClickListener {
             // 打开开源协议
-            var intent = Intent(this,OssLicensesMenuActivity::class.java)
+            var intent = Intent(this, OpenSourceLicenseActivity::class.java)
             startActivity(intent)
         }
 
+        var github_repo = findViewById<LinearLayout>(R.id.github_repo)
+        github_repo.setOnClickListener {
+            // 打开开源协议
+            var intent = Intent(this, WebActivity::class.java)
+            intent.putExtra(
+                "url",
+                "https://github.com/trueWangSyutung/Morse-input-method-OpenSource"
+            )
+            startActivity(intent)
+        }
 
 
     }
