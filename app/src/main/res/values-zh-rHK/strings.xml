@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">莫爾斯輸入法</string>
+    <string name="subtype_en_US">莫爾斯輸入法</string>
+    <string name="subtype_zh_CN">莫爾斯輸入法</string>
+    <string name="ime_name">莫爾斯輸入法</string>
+    <string name="jihuo">啟動輸入法</string>
+    <string name="qiyong">启用输入法</string>
+    <string name="act">請先啟動並啟用輸入法</string>
+    <string name="input">你可以在這裡嘗試使用一下輸入法</string>
+    <string name="local">中華人民共和國·河南</string>
+    <string name="local_my">中華人民共和國·河南</string>
+</resources>

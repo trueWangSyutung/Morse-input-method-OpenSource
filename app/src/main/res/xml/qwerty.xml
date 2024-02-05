@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+
+    >
+    <Row>
+        <Key android:codes="999" android:keyLabel="·" android:keyEdgeFlags="left"/>
+        <Key android:codes="998" android:keyLabel="-"  />
+    </Row>
+
+
+</Keyboard>

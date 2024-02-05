@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Morse input method</string>
+    <string name="subtype_en_US">Morse input method</string>
+    <string name="subtype_zh_CN">Morse input method</string>
+    <string name="ime_name">Morse input method</string>
+    <string name="jihuo">Activate</string>
+    <string name="qiyong">Enable</string>
+    <string name="act">Please activate the input method</string>
+    <string name="input">You can try the ime in here</string>
+    <string name="local_my" >Henan Province, The People\'s Republic of China</string>
+</resources>

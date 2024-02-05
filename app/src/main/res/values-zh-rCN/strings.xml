@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">莫尔斯输入法</string>
+    <string name="subtype_en_US">莫尔斯输入法</string>
+    <string name="subtype_zh_CN">莫尔斯输入法</string>
+    <string name="ime_name">莫尔斯输入法</string>
+    <string name="jihuo">激活输入法</string>
+    <string name="qiyong">启用输入法</string>
+    <string name="act">请先激活并启用输入法</string>
+    <string name="input">你可以在这里尝试一下这个输入法</string>
+    <string name="local">中华人民共和国·河南</string>
+    <string name="local_my">中华人民共和国·河南</string>
+</resources>
