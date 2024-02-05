@@ -11,8 +11,8 @@ android {
         applicationId = "kg.edu.yjut.morseinputmethod"
         minSdk = 24
         targetSdk = 34
-        versionCode = 10001
-        versionName = "1.0.2"
+        versionCode = 11000
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
