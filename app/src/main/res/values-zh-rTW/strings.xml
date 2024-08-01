@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">莫爾斯輸入法</string>
+    <string name="subtype_en_US">莫爾斯輸入法</string>
+    <string name="subtype_zh_CN">莫爾斯輸入法</string>
+    <string name="ime_name">莫爾斯輸入法</string>
+    <string name="jihuo">啟動輸入法</string>
+    <string name="qiyong">启用输入法</string>
+    <string name="act">請先啟動並啟用輸入法</string>
+    <string name="input">你可以在這裡嘗試使用一下輸入法</string>
+    <string name="local_my">中華人民共和國·河南</string>
+    <string name="privacy_policy">隱私協議</string>
+    <string name="user_agreement">用戶協議</string>
+    <string name="open_source">開源許可</string>
+    <string name="github_repo">GitHub 倉庫</string>
+    <string name="step1">第一步</string>
+    <string name="step1_desp">啟動輸入法</string>
+    <string name="step2">第二步</string>
+    <string name="step2_desp">切換輸入法</string>
+    <string name="step3">第三步</string>
+    <string name="step3_desp">享用</string>
+    <string name="help">幫助</string>
+    <string name="help_desp">幫助中心</string>
+    <string name="about">關於</string>
+    <string name="about_desp">關於我們</string>
+    <string name="license">許可證</string>
+    <string name="license_desp">開源許可證</string>
+    <string name="settings">設定</string>
+    <string name="privacy">隱私</string>
+    <string name="privacy_desp">隱私許可</string>
+    <string name="callback">反饋</string>
+    <string name="en_code">英語莫爾斯電碼</string>
+    <string name="cn_code">漢語莫爾斯電碼</string>
+    <string name="input_code">請輸入電碼或中文</string>
+    <string name="more_codes">莫爾斯電碼</string>
+    <string name="powered_by">人民郵電出版社出版的《標準電碼本》（1983年9月第3版）</string>
+    <string name="open_source_lib">開源許可庫</string>
+    <string name="curr_version">當前版本</string>
+    <string name="curr_version_code">版本編號</string>
+    <string name="build_type">編譯類型</string>
+    <string name="last_update">最近更新時間</string>
+    <string name="sound_desp">按鍵音效</string>
+    <string name="vibrate_desp">按鍵震動</string>
+</resources>

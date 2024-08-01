@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission
+        android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.BIND_INPUT_METHOD"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_morse"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_morse_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MorseInputMethod"
+        tools:targetApi="31">
+        <meta-data
+            android:name="buildType"
+            android:value="release" />
+
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.AboutActivity"
+            android:exported="false"
+            android:label="@string/title_activity_about"
+            android:theme="@style/Theme.MorseInputMethod" />
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.HelpChineseActivity"
+            android:exported="false"
+            android:label="@string/title_activity_help_chinese"
+            android:theme="@style/Theme.MorseInputMethod" />
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.HelpEnglishMorseCode"
+            android:exported="false"
+            android:label="@string/title_activity_help_english_morse_code"
+            android:theme="@style/Theme.MorseInputMethod" />
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.HelpCenterActivity"
+            android:exported="false"
+            android:label="@string/title_activity_help_center"
+            android:theme="@style/Theme.MorseInputMethod" />
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.WebViewActivity"
+            android:exported="false"
+            android:label="@string/title_activity_web_view"
+            android:theme="@style/Theme.MorseInputMethod" />
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.MainPageActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main_page"
+            android:theme="@style/Theme.MorseInputMethod" />
+        <activity
+            android:name="kg.edu.yjut.morseinputmethod.view.InitActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MorseInputMethod">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <service
+            android:name="kg.edu.yjut.morseinputmethod.services.MorseInputService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/ime_name"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
+    </application>
+
+</manifest>

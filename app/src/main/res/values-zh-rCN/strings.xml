@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">莫尔斯输入法</string>
+    <string name="subtype_en_US">莫尔斯输入法</string>
+    <string name="subtype_zh_CN">莫尔斯输入法</string>
+    <string name="ime_name">莫尔斯输入法</string>
+    <string name="jihuo">激活输入法</string>
+    <string name="qiyong">启用输入法</string>
+    <string name="act">请先激活并启用输入法</string>
+    <string name="input">你可以在这里尝试一下这个输入法</string>
+    <string name="local_my">中华人民共和国·河南</string>
+    <string name="privacy_policy">隐私协议</string>
+    <string name="user_agreement">用户协议</string>
+    <string name="open_source">开源许可</string>
+    <string name="github_repo">Github 仓库</string>
+    <string name="step1">第一步</string>
+    <string name="step1_desp">激活输入法</string>
+    <string name="step2">第二步</string>
+    <string name="step2_desp">切换输入法</string>
+    <string name="step3">第三步</string>
+    <string name="step3_desp">享用</string>
+    <string name="help">帮助</string>
+    <string name="help_desp">帮助中心</string>
+    <string name="about">关于</string>
+    <string name="about_desp">关于我们</string>
+    <string name="license">许可证</string>
+    <string name="license_desp">开源许可证</string>
+    <string name="settings">设置</string>
+    <string name="privacy">隐私</string>
+    <string name="privacy_desp">隐私协议</string>
+    <string name="callback">反馈</string>
+    <string name="en_code">英文莫尔斯电码</string>
+    <string name="cn_code">中文莫尔斯电码</string>
+    <string name="input_code">请输入电码或者中文</string>
+    <string name="more_codes">莫尔斯电码</string>
+    <string name="powered_by">人民邮电出版社出版的《标准电码本》（1983年9月第3版）</string>
+    <string name="open_source_lib">开源许可库</string>
+    <string name="curr_version">当前版本</string>
+    <string name="curr_version_code">版本编号</string>
+    <string name="build_type">编译类型</string>
+    <string name="last_update">最近更新时间</string>
+    <string name="sound_desp">按键音效</string>
+    <string name="vibrate_desp">按键震动</string>
+</resources>

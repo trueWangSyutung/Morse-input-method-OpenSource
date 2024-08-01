@@ -1,0 +1,25 @@
+                    OSC LICENSE
+              Version 1, 30 July 2024
+
+    Copyright (C) 2024 OpenSoftware Community, Inc. <https://wxd2zrx.top/>
+    Everyone can copy and distribute this license document, but changes are not allowed.
+
+                            Preamble
+
+    The OSC LICENSE is a free, copyleft license for software and other kinds of works,
+  specifically designed to ensure cooperation with the community in the case of network
+  server software.
+
+                             Right
+    The OSC open source protocol allows for free redistribution and modification of software,
+but requires that the copyright of the code before modification belongs to the initiator
+of the software. It is necessary to clearly add the user information of the original author
+ in the software, including but not limited to the original author's GitHub link.
+ The copyright of the software modified by the modifier belongs to the modifier.
+
+
+                             Commercial
+    The OSC open source protocol allows modifiers to use software for commercial activities.
+
+    You should also get your employer (if you work as a programmer) or school,
+  if any, to sign a "copyright disclaimer" for the program, if necessary.
