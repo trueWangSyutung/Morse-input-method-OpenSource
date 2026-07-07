@@ -1,4 +1,4 @@
-package cn.tw.sar.easylauncher.utils
+package kg.edu.yjut.morseinputmethod.utils
 
 import android.content.Context
 import android.content.Intent

@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.tw.sar.easylauncher.utils.getDarkModeBackgroundColor
-import cn.tw.sar.easylauncher.utils.getDarkModeTextColor
+import kg.edu.yjut.morseinputmethod.utils.getDarkModeBackgroundColor
+import kg.edu.yjut.morseinputmethod.utils.getDarkModeTextColor
 import cn.sar.tw.morseinputmethod.R
 import kg.edu.yjut.morseinputmethod.view.ui.theme.MorseInputMethodTheme
 

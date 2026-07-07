@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.tw.sar.easylauncher.utils.getDarkModeBackgroundColor
-import cn.tw.sar.easylauncher.utils.getDarkModeTextColor
+import kg.edu.yjut.morseinputmethod.utils.getDarkModeBackgroundColor
+import kg.edu.yjut.morseinputmethod.utils.getDarkModeTextColor
 import cn.sar.tw.morseinputmethod.R
 import kg.edu.yjut.morseinputmethod.utils.isCurrIME
 import kg.edu.yjut.morseinputmethod.utils.isEnableIME

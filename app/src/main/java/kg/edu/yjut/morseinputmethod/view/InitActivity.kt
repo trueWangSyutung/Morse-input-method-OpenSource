@@ -53,6 +53,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cn.sar.tw.morseinputmethod.R
+
+import kg.edu.yjut.morseinputmethod.utils.getDarkModeBackgroundColor
+import kg.edu.yjut.morseinputmethod.utils.getDarkModeTextColor
+import kg.edu.yjut.morseinputmethod.utils.getUnDarkModeTextColor
 import kg.edu.yjut.morseinputmethod.utils.isCurrIME
 import kg.edu.yjut.morseinputmethod.utils.isEnableIME
 import kg.edu.yjut.morseinputmethod.view.ui.theme.MorseInputMethodTheme
@@ -102,11 +106,17 @@ private fun InitWizard(
     onSwitchIME: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val textColor = getDarkModeTextColor(context)
+    val textColorSecondary = getDarkModeTextColor(context).copy(alpha = 0.7f)
+    val bgColor = getDarkModeBackgroundColor(context, 0)
+    val accentColor = Color(0xFF3B82F6)
+
     var currentStep by remember { mutableIntStateOf(0) }
     var showPopup by remember { mutableStateOf(false) }
     var popupType by remember { mutableStateOf("enable") }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize().background(bgColor)) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
@@ -122,7 +132,7 @@ private fun InitWizard(
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
-                    WelcomeStep()
+                    WelcomeStep(textColor = textColor, textColorSecondary = textColorSecondary, accentColor = accentColor)
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
@@ -130,7 +140,7 @@ private fun InitWizard(
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
-                    EnableIMEStep()
+                    EnableIMEStep(textColor = textColor, textColorSecondary = textColorSecondary, accentColor = accentColor)
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
@@ -138,7 +148,7 @@ private fun InitWizard(
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
-                    SwitchIMEStep()
+                    SwitchIMEStep(textColor = textColor, textColorSecondary = textColorSecondary, accentColor = accentColor)
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
@@ -146,7 +156,7 @@ private fun InitWizard(
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
-                    CompleteStep()
+                    CompleteStep(textColor = textColor, textColorSecondary = textColorSecondary, accentColor = accentColor)
                 }
             }
 
@@ -157,11 +167,13 @@ private fun InitWizard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                StepIndicators(currentStep = currentStep, totalSteps = 4)
+                StepIndicators(currentStep = currentStep, totalSteps = 4, accentColor = accentColor)
 
                 ActionButton(
                     currentStep = currentStep,
                     totalSteps = 4,
+                    textColor = textColor,
+                    accentColor = accentColor,
                     onNext = {
                         when (currentStep) {
                             0 -> currentStep = 1
@@ -200,6 +212,10 @@ private fun InitWizard(
         ) {
             SimPopup(
                 type = popupType,
+                textColor = textColor,
+                textColorSecondary = textColorSecondary,
+                accentColor = accentColor,
+                bgColor = getDarkModeBackgroundColor(context, 1),
                 onConfirm = {
                     showPopup = false
                     if (popupType == "enable") {
@@ -215,7 +231,7 @@ private fun InitWizard(
 }
 
 @Composable
-private fun WelcomeStep() {
+private fun WelcomeStep(textColor: Color, textColorSecondary: Color, accentColor: Color) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -224,13 +240,13 @@ private fun WelcomeStep() {
             modifier = Modifier
                 .size(128.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF3B82F6).copy(alpha = 0.2f)),
+                .background(accentColor.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                     imageVector = Icons.Filled.RadioButtonChecked,
                     contentDescription = "Radio Tower",
-                    tint = Color(0xFF3B82F6),
+                    tint = accentColor,
                     modifier = Modifier.size(64.dp)
                 )
         }
@@ -239,20 +255,20 @@ private fun WelcomeStep() {
             text = "欢迎使用莫尔斯输入法",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = textColor
         )
 
         Text(
             text = "复古电码 指尖传承",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF3B82F6)
+            color = accentColor
         )
 
         Text(
             text = "本应用是一款基于莫尔斯电码的输入法，让您在指尖重现经典电报通信体验。",
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.7f),
+            color = textColorSecondary,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 32.dp)
@@ -261,7 +277,7 @@ private fun WelcomeStep() {
 }
 
 @Composable
-private fun EnableIMEStep() {
+private fun EnableIMEStep(textColor: Color, textColorSecondary: Color, accentColor: Color) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -270,13 +286,13 @@ private fun EnableIMEStep() {
             modifier = Modifier
                 .size(80.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF3B82F6).copy(alpha = 0.1f)),
+                .background(accentColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                     imageVector = Icons.Filled.Settings,
                     contentDescription = "Settings",
-                    tint = Color(0xFF3B82F6),
+                    tint = accentColor,
                     modifier = Modifier.size(40.dp)
                 )
         }
@@ -285,13 +301,13 @@ private fun EnableIMEStep() {
             text = "启用输入法",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = textColor
         )
 
         Text(
             text = "请前往系统设置，启用「莫尔斯输入法」以开始使用。",
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.7f),
+            color = textColorSecondary,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 32.dp)
@@ -300,7 +316,7 @@ private fun EnableIMEStep() {
 }
 
 @Composable
-private fun SwitchIMEStep() {
+private fun SwitchIMEStep(textColor: Color, textColorSecondary: Color, accentColor: Color) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -309,28 +325,28 @@ private fun SwitchIMEStep() {
             modifier = Modifier
                 .size(80.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF3B82F6).copy(alpha = 0.1f)),
+                .background(accentColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Filled.Keyboard,
-                contentDescription = "Keyboard",
-                tint = Color(0xFF3B82F6),
-                modifier = Modifier.size(40.dp)
-            )
+                    imageVector = Icons.Filled.Keyboard,
+                    contentDescription = "Keyboard",
+                    tint = accentColor,
+                    modifier = Modifier.size(40.dp)
+                )
         }
 
         Text(
             text = "设为默认输入法",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = textColor
         )
 
         Text(
             text = "请在输入法切换菜单中选择「莫尔斯输入法」，设置为当前使用的输入法。",
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.7f),
+            color = textColorSecondary,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp,
             modifier = Modifier.padding(horizontal = 32.dp)
@@ -339,7 +355,8 @@ private fun SwitchIMEStep() {
 }
 
 @Composable
-private fun CompleteStep() {
+private fun CompleteStep(textColor: Color, textColorSecondary: Color, accentColor: Color) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -348,7 +365,7 @@ private fun CompleteStep() {
             text = "准备就绪",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF3B82F6)
+            color = accentColor
         )
 
         val scale by animateFloatAsState(
@@ -369,7 +386,7 @@ private fun CompleteStep() {
         Text(
             text = "所有设置已完成，现在开始体验莫尔斯电码输入！",
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.7f),
+            color = textColorSecondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 32.dp)
         )
@@ -383,30 +400,39 @@ private fun CompleteStep() {
             FeatureCard(
                 icon = "📡",
                 title = "拟物发报键",
-                description = "真实电报击键感"
+                description = "真实电报击键感",
+                textColor = textColor,
+                textColorSecondary = textColorSecondary,
+                bgColor = getDarkModeBackgroundColor(context, 1)
             )
             FeatureCard(
                 icon = "🔄",
                 title = "实时转码",
-                description = "莫尔斯码即时翻译"
+                description = "莫尔斯码即时翻译",
+                textColor = textColor,
+                textColorSecondary = textColorSecondary,
+                bgColor = getDarkModeBackgroundColor(context, 1)
             )
             FeatureCard(
                 icon = "🎮",
                 title = "学习训练",
-                description = "趣味掌握电码表"
+                description = "趣味掌握电码表",
+                textColor = textColor,
+                textColorSecondary = textColorSecondary,
+                bgColor = getDarkModeBackgroundColor(context, 1)
             )
         }
     }
 }
 
 @Composable
-private fun FeatureCard(icon: String, title: String, description: String) {
+private fun FeatureCard(icon: String, title: String, description: String, textColor: Color, textColorSecondary: Color, bgColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF1E1E1E)),
+            .background(bgColor),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -423,26 +449,26 @@ private fun FeatureCard(icon: String, title: String, description: String) {
                 text = title,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = textColor
             )
             Text(
                 text = description,
                 fontSize = 10.sp,
-                color = Color.White.copy(alpha = 0.6f)
+                color = textColorSecondary
             )
         }
     }
 }
 
 @Composable
-private fun StepIndicators(currentStep: Int, totalSteps: Int) {
+private fun StepIndicators(currentStep: Int, totalSteps: Int, accentColor: Color) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         repeat(totalSteps) { step ->
             val isActive = step == currentStep
             val color by animateColorAsState(
-                targetValue = if (isActive) Color(0xFF3B82F6) else Color(0xFF3B82F6).copy(alpha = 0.3f),
+                targetValue = if (isActive) accentColor else accentColor.copy(alpha = 0.3f),
                 label = "indicatorColor"
             )
             Box(
@@ -459,6 +485,8 @@ private fun StepIndicators(currentStep: Int, totalSteps: Int) {
 private fun ActionButton(
     currentStep: Int,
     totalSteps: Int,
+    textColor: Color,
+    accentColor: Color,
     onNext: () -> Unit,
     onPrev: () -> Unit,
     onEnableIME: () -> Unit,
@@ -476,7 +504,7 @@ private fun ActionButton(
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(Color(0xFF3B82F6))
+            .background(accentColor)
             .scale(scale)
             .clickable {
                 isPressed = true
@@ -501,7 +529,7 @@ private fun ActionButton(
 }
 
 @Composable
-private fun SimPopup(type: String, onConfirm: () -> Unit, onClose: () -> Unit) {
+private fun SimPopup(type: String, textColor: Color, textColorSecondary: Color, accentColor: Color, bgColor: Color, onConfirm: () -> Unit, onClose: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -514,7 +542,7 @@ private fun SimPopup(type: String, onConfirm: () -> Unit, onClose: () -> Unit) {
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFF1E1E1E))
+                .background(bgColor)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -523,7 +551,7 @@ private fun SimPopup(type: String, onConfirm: () -> Unit, onClose: () -> Unit) {
                 text = if (type == "enable") "启用输入法" else "切换输入法",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = textColor
             )
 
             Text(
@@ -533,7 +561,7 @@ private fun SimPopup(type: String, onConfirm: () -> Unit, onClose: () -> Unit) {
                     "请在输入法切换菜单中选择「莫尔斯输入法」"
                 },
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.8f),
+                color = textColorSecondary,
                 textAlign = TextAlign.Center,
                 lineHeight = 20.sp
             )
@@ -543,7 +571,7 @@ private fun SimPopup(type: String, onConfirm: () -> Unit, onClose: () -> Unit) {
                     .fillMaxWidth()
                     .height(48.dp)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFF3B82F6))
+                    .background(accentColor)
                     .clickable { onConfirm() },
                 contentAlignment = Alignment.Center
             ) {
