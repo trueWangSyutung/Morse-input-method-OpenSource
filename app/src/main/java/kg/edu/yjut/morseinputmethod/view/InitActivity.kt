@@ -62,6 +62,25 @@ import kg.edu.yjut.morseinputmethod.utils.isEnableIME
 import kg.edu.yjut.morseinputmethod.view.ui.theme.MorseInputMethodTheme
 
 class InitActivity : ComponentActivity() {
+    private var currentStep = androidx.compose.runtime.mutableIntStateOf(0)
+
+    override fun onResume() {
+        super.onResume()
+        updateStepBasedOnIMEStatus()
+    }
+
+    private fun updateStepBasedOnIMEStatus() {
+        val isEnabled = isEnableIME(this)
+        val isCurrent = isCurrIME(this)
+
+        if (!isEnabled) {
+            currentStep.value = 1
+        } else if (!isCurrent) {
+            currentStep.value = 2
+        } else {
+            currentStep.value = 3
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,11 +91,13 @@ class InitActivity : ComponentActivity() {
             startActivity(intent)
             finish()
         }
+        updateStepBasedOnIMEStatus()
         enableEdgeToEdge()
         setContent {
             MorseInputMethodTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     InitWizard(
+                        currentStep = currentStep,
                         onComplete = {
                             settings.edit().putBoolean("is_first", false).apply()
                             val intent = Intent(this, MainPageActivity::class.java)
@@ -101,6 +122,7 @@ class InitActivity : ComponentActivity() {
 
 @Composable
 private fun InitWizard(
+    currentStep: androidx.compose.runtime.MutableIntState,
     onComplete: () -> Unit,
     onEnableIME: () -> Unit,
     onSwitchIME: () -> Unit,
@@ -112,7 +134,7 @@ private fun InitWizard(
     val bgColor = getDarkModeBackgroundColor(context, 0)
     val accentColor = Color(0xFF3B82F6)
 
-    var currentStep by remember { mutableIntStateOf(0) }
+    val step = currentStep
     var showPopup by remember { mutableStateOf(false) }
     var popupType by remember { mutableStateOf("enable") }
 
@@ -128,7 +150,7 @@ private fun InitWizard(
                 contentAlignment = Alignment.Center
             ) {
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = currentStep == 0,
+                    visible = step.value == 0,
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
@@ -136,7 +158,7 @@ private fun InitWizard(
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = currentStep == 1,
+                    visible = step.value == 1,
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
@@ -144,7 +166,7 @@ private fun InitWizard(
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = currentStep == 2,
+                    visible = step.value == 2,
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
@@ -152,7 +174,7 @@ private fun InitWizard(
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = currentStep == 3,
+                    visible = step.value == 3,
                     enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
                     exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
                 ) {
@@ -167,16 +189,16 @@ private fun InitWizard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                StepIndicators(currentStep = currentStep, totalSteps = 4, accentColor = accentColor)
+                StepIndicators(currentStep = step.value, totalSteps = 4, accentColor = accentColor)
 
                 ActionButton(
-                    currentStep = currentStep,
+                    currentStep = step.value,
                     totalSteps = 4,
                     textColor = textColor,
                     accentColor = accentColor,
                     onNext = {
-                        when (currentStep) {
-                            0 -> currentStep = 1
+                        when (step.value) {
+                            0 -> currentStep.value = 1
                             1 -> {
                                 popupType = "enable"
                                 showPopup = true
@@ -189,8 +211,8 @@ private fun InitWizard(
                         }
                     },
                     onPrev = {
-                        if (currentStep > 0) {
-                            currentStep--
+                        if (currentStep.value > 0) {
+                            currentStep.value--
                         }
                     },
                     onEnableIME = {
