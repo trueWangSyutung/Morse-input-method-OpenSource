@@ -5,102 +5,66 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cn.tw.sar.easylauncher.utils.getDarkModeBackgroundColor
-import cn.tw.sar.easylauncher.utils.getDarkModeTextColor
-import cn.tw.sar.easylauncher.weight.LineBar
 import cn.sar.tw.morseinputmethod.R
 import kg.edu.yjut.morseinputmethod.utils.isCurrIME
 import kg.edu.yjut.morseinputmethod.utils.isEnableIME
 import kg.edu.yjut.morseinputmethod.view.ui.theme.MorseInputMethodTheme
 
-data class InitPageInfo(
-    val title: String,
-    val description: String,
-    val action: () -> Unit
-)
-
-
-
-
 class InitActivity : ComponentActivity() {
-    private var initPageInfoList = mutableStateListOf<InitPageInfo>()
-
-    override fun onResume() {
-        super.onResume()
-        val curr = listOf(
-            InitPageInfo(
-                title = resources.getString(R.string.step1),
-                description = resources.getString(R.string.step1_desp),
-                action = {
-                    if (!isEnableIME(this@InitActivity)){
-                        val intent = android.content.Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS)
-                        startActivity(intent)
-                    }
-                }
-            ),
-            InitPageInfo(
-                title = resources.getString(R.string.step2),
-                description = resources.getString(R.string.step2_desp),
-                action = {
-                    if (!isCurrIME(this@InitActivity)){
-                        val imeManager = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-                        imeManager.showInputMethodPicker()
-                    }
-                }
-            ),
-            InitPageInfo(
-                title = resources.getString(R.string.step3),
-                description = resources.getString(R.string.step3_desp),
-                action = {
-                    val sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE)
-                    sharedPreferences.edit().putBoolean("is_first", false).apply()
-                    var intent = Intent(this@InitActivity, MainPageActivity::class.java)
-                    startActivity(intent)
-                    finish()
-
-                }
-            ),
-        )
-        initPageInfoList.clear()
-        initPageInfoList.addAll(curr)
-
-    }
-    private var currPageIndex = mutableStateOf(0)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var settings = getSharedPreferences("settings", MODE_PRIVATE)
-        var isFirstTime = settings.getBoolean("is_first", true)
+        val settings = getSharedPreferences("settings", MODE_PRIVATE)
+        val isFirstTime = settings.getBoolean("is_first", true)
         if (!isFirstTime) {
-            var intent = Intent(this, MainPageActivity::class.java)
+            val intent = Intent(this, MainPageActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -108,100 +72,487 @@ class InitActivity : ComponentActivity() {
         setContent {
             MorseInputMethodTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                color = getDarkModeBackgroundColor(
-                                    context = this@InitActivity,
-                                    level = 0
-                                )
-                            )
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .fillMaxWidth()
-                                .fillMaxHeight(0.9f),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(painter = painterResource(id = R.mipmap.logo),
-                                contentDescription = "Logo",
-                                modifier = Modifier
-                                    .width(400.dp)
-                                    .height(200.dp)
-                                    .padding(20.dp).clip(RoundedCornerShape(25.dp)),
-
-                            )
-                            Text(
-                                text = initPageInfoList[currPageIndex.value].title,
-                                color = getDarkModeTextColor(this@InitActivity),
-                                fontSize = 20.sp,
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold
-                            )
-                            TextButton(
-                                onClick = {
-                                    initPageInfoList[currPageIndex.value].action()
-                                },
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .background(
-                                        color = getDarkModeBackgroundColor(
-                                            context = this@InitActivity,
-                                            level = 1
-                                        ),
-                                        shape = RoundedCornerShape(9999.dp)
-                                    ),
-                            ) {
-                                Text(
-                                    text = initPageInfoList[currPageIndex.value].description,
-                                    color = getDarkModeTextColor(this@InitActivity),
-                                    fontSize = 15.sp,
-                                    modifier = Modifier
-                                        .padding(5.dp),
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            }
-
-                        }
-                        Column(
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .fillMaxWidth()
-                                .fillMaxHeight(1f),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            LineBar(
-                                maxPage = initPageInfoList.size,
-                                page = currPageIndex.value + 1,
-                                onRightEnd = {
-                                    currPageIndex.value = (currPageIndex.value+ 1) % initPageInfoList.size
-                                },
-                                onLeftEnd = {
-                                    if (currPageIndex.value != 0) {
-                                        currPageIndex.value = initPageInfoList.size - 1
-                                    }else{
-                                        currPageIndex.value = initPageInfoList.size - 1
-                                    }
-                                },
-                                onDotsClick = {
-                                    currPageIndex.value = it - 1
-                                },
-                            )
-                        }
-
-                    }
+                    InitWizard(
+                        onComplete = {
+                            settings.edit().putBoolean("is_first", false).apply()
+                            val intent = Intent(this, MainPageActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        },
+                        onEnableIME = {
+                            val intent = Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS)
+                            startActivity(intent)
+                        },
+                        onSwitchIME = {
+                            val imeManager = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                            imeManager.showInputMethodPicker()
+                        },
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InitWizard(
+    onComplete: () -> Unit,
+    onEnableIME: () -> Unit,
+    onSwitchIME: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var currentStep by remember { mutableIntStateOf(0) }
+    var showPopup by remember { mutableStateOf(false) }
+    var popupType by remember { mutableStateOf("enable") }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = currentStep == 0,
+                    enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
+                    exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
+                ) {
+                    WelcomeStep()
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = currentStep == 1,
+                    enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
+                    exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
+                ) {
+                    EnableIMEStep()
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = currentStep == 2,
+                    enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
+                    exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
+                ) {
+                    SwitchIMEStep()
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = currentStep == 3,
+                    enter = fadeIn(tween(300)) + scaleIn(tween(300), initialScale = 0.9f),
+                    exit = fadeOut(tween(200)) + scaleOut(tween(200), targetScale = 0.9f)
+                ) {
+                    CompleteStep()
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(32.dp)
+            ) {
+                StepIndicators(currentStep = currentStep, totalSteps = 4)
+
+                ActionButton(
+                    currentStep = currentStep,
+                    totalSteps = 4,
+                    onNext = {
+                        when (currentStep) {
+                            0 -> currentStep = 1
+                            1 -> {
+                                popupType = "enable"
+                                showPopup = true
+                            }
+                            2 -> {
+                                popupType = "switch"
+                                showPopup = true
+                            }
+                            3 -> onComplete()
+                        }
+                    },
+                    onPrev = {
+                        if (currentStep > 0) {
+                            currentStep--
+                        }
+                    },
+                    onEnableIME = {
+                        showPopup = false
+                        onEnableIME()
+                    },
+                    onSwitchIME = {
+                        showPopup = false
+                        onSwitchIME()
+                    }
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showPopup,
+            enter = fadeIn(tween(200)),
+            exit = fadeOut(tween(200))
+        ) {
+            SimPopup(
+                type = popupType,
+                onConfirm = {
+                    showPopup = false
+                    if (popupType == "enable") {
+                        onEnableIME()
+                    } else {
+                        onSwitchIME()
+                    }
+                },
+                onClose = { showPopup = false }
+            )
+        }
+    }
+}
+
+@Composable
+private fun WelcomeStep() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(128.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF3B82F6).copy(alpha = 0.2f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                    imageVector = Icons.Filled.RadioButtonChecked,
+                    contentDescription = "Radio Tower",
+                    tint = Color(0xFF3B82F6),
+                    modifier = Modifier.size(64.dp)
+                )
+        }
+
+        Text(
+            text = "欢迎使用莫尔斯输入法",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+
+        Text(
+            text = "复古电码 指尖传承",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF3B82F6)
+        )
+
+        Text(
+            text = "本应用是一款基于莫尔斯电码的输入法，让您在指尖重现经典电报通信体验。",
+            fontSize = 14.sp,
+            color = Color.White.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            lineHeight = 20.sp,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+    }
+}
+
+@Composable
+private fun EnableIMEStep() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color(0xFF3B82F6).copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Settings",
+                    tint = Color(0xFF3B82F6),
+                    modifier = Modifier.size(40.dp)
+                )
+        }
+
+        Text(
+            text = "启用输入法",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+
+        Text(
+            text = "请前往系统设置，启用「莫尔斯输入法」以开始使用。",
+            fontSize = 14.sp,
+            color = Color.White.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            lineHeight = 20.sp,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+    }
+}
+
+@Composable
+private fun SwitchIMEStep() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color(0xFF3B82F6).copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Keyboard,
+                contentDescription = "Keyboard",
+                tint = Color(0xFF3B82F6),
+                modifier = Modifier.size(40.dp)
+            )
+        }
+
+        Text(
+            text = "设为默认输入法",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+
+        Text(
+            text = "请在输入法切换菜单中选择「莫尔斯输入法」，设置为当前使用的输入法。",
+            fontSize = 14.sp,
+            color = Color.White.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            lineHeight = 20.sp,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+    }
+}
+
+@Composable
+private fun CompleteStep() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "准备就绪",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF3B82F6)
+        )
+
+        val scale by animateFloatAsState(
+            targetValue = 1f,
+            animationSpec = androidx.compose.animation.core.tween(1000, 500),
+            label = "checkScale"
+        )
+
+        Icon(
+            imageVector = Icons.Filled.CheckCircle,
+            contentDescription = "Check",
+            tint = Color(0xFF22C55E),
+            modifier = Modifier
+                .size(96.dp)
+                .scale(scale)
+        )
+
+        Text(
+            text = "所有设置已完成，现在开始体验莫尔斯电码输入！",
+            fontSize = 14.sp,
+            color = Color.White.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            FeatureCard(
+                icon = "📡",
+                title = "拟物发报键",
+                description = "真实电报击键感"
+            )
+            FeatureCard(
+                icon = "🔄",
+                title = "实时转码",
+                description = "莫尔斯码即时翻译"
+            )
+            FeatureCard(
+                icon = "🎮",
+                title = "学习训练",
+                description = "趣味掌握电码表"
+            )
+        }
+    }
+}
+
+@Composable
+private fun FeatureCard(icon: String, title: String, description: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF1E1E1E)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = icon, fontSize = 24.sp)
+        }
+        Column {
+            Text(
+                text = title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = description,
+                fontSize = 10.sp,
+                color = Color.White.copy(alpha = 0.6f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun StepIndicators(currentStep: Int, totalSteps: Int) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        repeat(totalSteps) { step ->
+            val isActive = step == currentStep
+            val color by animateColorAsState(
+                targetValue = if (isActive) Color(0xFF3B82F6) else Color(0xFF3B82F6).copy(alpha = 0.3f),
+                label = "indicatorColor"
+            )
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(color)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ActionButton(
+    currentStep: Int,
+    totalSteps: Int,
+    onNext: () -> Unit,
+    onPrev: () -> Unit,
+    onEnableIME: () -> Unit,
+    onSwitchIME: () -> Unit
+) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = androidx.compose.animation.core.tween(100),
+        label = "buttonScale"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(28.dp))
+            .background(Color(0xFF3B82F6))
+            .scale(scale)
+            .clickable {
+                isPressed = true
+                onNext()
+                isPressed = false
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = when (currentStep) {
+                0 -> "开始设置"
+                1 -> "前往系统设置"
+                2 -> "切换输入法"
+                3 -> "开始使用"
+                else -> "下一步"
+            },
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+    }
+}
+
+@Composable
+private fun SimPopup(type: String, onConfirm: () -> Unit, onClose: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0x99000000))
+            .clickable { onClose() },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFF1E1E1E))
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = if (type == "enable") "启用输入法" else "切换输入法",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
+            Text(
+                text = if (type == "enable") {
+                    "请在系统「设置 → 语言与输入法 → 管理键盘」中开启「莫尔斯输入法」"
+                } else {
+                    "请在输入法切换菜单中选择「莫尔斯输入法」"
+                },
+                fontSize = 14.sp,
+                color = Color.White.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center,
+                lineHeight = 20.sp
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color(0xFF3B82F6))
+                    .clickable { onConfirm() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "我已启用",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }
