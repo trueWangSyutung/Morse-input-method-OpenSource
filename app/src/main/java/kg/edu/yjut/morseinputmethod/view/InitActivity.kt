@@ -200,12 +200,20 @@ private fun InitWizard(
                         when (step.value) {
                             0 -> currentStep.value = 1
                             1 -> {
-                                popupType = "enable"
-                                showPopup = true
+                                if (isEnableIME(context)) {
+                                    currentStep.value = 2
+                                } else {
+                                    popupType = "enable"
+                                    showPopup = true
+                                }
                             }
                             2 -> {
-                                popupType = "switch"
-                                showPopup = true
+                                if (isCurrIME(context)) {
+                                    currentStep.value = 3
+                                } else {
+                                    popupType = "switch"
+                                    showPopup = true
+                                }
                             }
                             3 -> onComplete()
                         }
@@ -228,27 +236,35 @@ private fun InitWizard(
         }
 
         AnimatedVisibility(
-            visible = showPopup,
-            enter = fadeIn(tween(200)),
-            exit = fadeOut(tween(200))
-        ) {
-            SimPopup(
-                type = popupType,
-                textColor = textColor,
-                textColorSecondary = textColorSecondary,
-                accentColor = accentColor,
-                bgColor = getDarkModeBackgroundColor(context, 1),
-                onConfirm = {
-                    showPopup = false
-                    if (popupType == "enable") {
-                        onEnableIME()
-                    } else {
-                        onSwitchIME()
-                    }
-                },
-                onClose = { showPopup = false }
-            )
-        }
+                    visible = showPopup,
+                    enter = fadeIn(tween(200)),
+                    exit = fadeOut(tween(200))
+                ) {
+                    SimPopup(
+                        type = popupType,
+                        textColor = textColor,
+                        textColorSecondary = textColorSecondary,
+                        accentColor = accentColor,
+                        bgColor = getDarkModeBackgroundColor(context, 1),
+                        onConfirm = {
+                            showPopup = false
+                            if (popupType == "enable") {
+                                if (isEnableIME(context)) {
+                                    currentStep.value = 2
+                                } else {
+                                    onEnableIME()
+                                }
+                            } else {
+                                if (isCurrIME(context)) {
+                                    currentStep.value = 3
+                                } else {
+                                    onSwitchIME()
+                                }
+                            }
+                        },
+                        onClose = { showPopup = false }
+                    )
+                }
     }
 }
 

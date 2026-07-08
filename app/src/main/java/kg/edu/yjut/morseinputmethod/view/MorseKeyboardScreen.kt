@@ -6,31 +6,34 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.SpaceBar
+import androidx.compose.material.icons.filled.SpaceBar
+import androidx.compose.material.icons.outlined.Brightness4
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -40,68 +43,120 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kg.edu.yjut.morseinputmethod.entity.MorseCode
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import kg.edu.yjut.morseinputmethod.viewmodel.MorseViewModel
 
 @Composable
 fun MorseKeyboardScreen(
     viewModel: MorseViewModel,
-    @Suppress("UNUSED_PARAMETER") onHideKeyboard: () -> Unit
+    onHideKeyboard: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val colorScheme = if (uiState.isDarkMode) darkColorScheme() else lightColorScheme()
 
+    // 主题色：深色模式使用蓝色，浅色模式使用青绿色（与原型图保持一致）
+    val accentColor = if (uiState.isDarkMode) Color(0xFF3B82F6) else Color(0xFF0D9488)
+    val bgColor = if (uiState.isDarkMode) Color(0xFF121212) else Color(0xFFF3F4F6)
+    val cardBg = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color.White
+    val textColor = if (uiState.isDarkMode) Color(0xFFE5E7EB) else Color(0xFF1F2937)
+    val secondaryText = if (uiState.isDarkMode) Color(0xFF4B5563) else Color(0xFF9CA3AF)
+    val inactiveTab = if (uiState.isDarkMode) Color(0xFF4B5563) else Color(0xFF9CA3AF)
+
     MaterialTheme(colorScheme = colorScheme) {
         Surface(
-            color = if (uiState.isDarkMode) Color(0xFF121212) else Color(0xFFF3F4F6),
+            color = bgColor,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(
+                        WindowInsets.navigationBars.asPaddingValues()
+                    )
             ) {
-                Header(context = context)
+                // 顶部标题栏
+                Header(
+                    textColor = textColor,
+                    onSettingsClick = {
+                        context.startActivity(
+                            Intent(context, MainPageActivity::class.java).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                        )
+                    }
+                )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                DisplayArea(uiState = uiState)
+                // 转码预览区
+                DisplayArea(
+                    morseBuffer = uiState.morseBuffer,
+                    textResult = uiState.textResult,
+                    accentColor = accentColor,
+                    cardBg = cardBg,
+                    textColor = textColor,
+                    secondaryText = secondaryText,
+                    inactiveTab = inactiveTab
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Box(modifier = Modifier.weight(1f)) {
-                    KeyboardArea(viewModel = viewModel)
+                // 键盘区
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    KeyboardArea(
+                        viewModel = viewModel,
+                        accentColor = accentColor,
+                        cardBg = cardBg
+                    )
 
-                    InputDisabledOverlay(isVisible = !uiState.inputEnabled)
+                    // 禁用遮罩
+                    InputDisabledOverlay(
+                        isVisible = !uiState.inputEnabled,
+                        cardBg = cardBg
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                BottomFunctionKeys(viewModel = viewModel, inputEnabled = uiState.inputEnabled)
+                // 底部功能键
+                BottomFunctionKeys(
+                    viewModel = viewModel,
+                    inputEnabled = uiState.inputEnabled,
+                    cardBg = cardBg,
+                    textColor = textColor
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
 }
 
 @Composable
-private fun Header(context: android.content.Context) {
+private fun Header(textColor: Color, onSettingsClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 8.dp),
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -109,81 +164,86 @@ private fun Header(context: android.content.Context) {
             text = "莫尔斯输入法",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = textColor
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.Circle,
+                imageVector = Icons.Outlined.Brightness4,
                 contentDescription = "theme",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {}
+                tint = textColor,
+                modifier = Modifier.size(24.dp)
             )
             Icon(
                 imageVector = Icons.Filled.Settings,
                 contentDescription = "settings",
-                tint = Color.White,
+                tint = textColor,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable {
-                        context.startActivity(
-                            Intent(context, MainPageActivity::class.java).apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
-                        )
-                    }
+                    .clickable { onSettingsClick() }
             )
         }
     }
 }
 
 @Composable
-private fun DisplayArea(uiState: kg.edu.yjut.morseinputmethod.viewmodel.KeyboardUiState) {
+private fun DisplayArea(
+    morseBuffer: String,
+    textResult: String,
+    accentColor: Color,
+    cardBg: Color,
+    textColor: Color,
+    secondaryText: Color,
+    inactiveTab: Color
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .height(120.dp)
-            .background(
-                color = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color.White,
-                shape = RoundedCornerShape(16.dp)
-            )
+            .height(140.dp)
+            .background(color = cardBg.copy(alpha = 0.5f), shape = RoundedCornerShape(20.dp))
             .padding(16.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // 莫尔斯缓冲区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .weight(1f)
+                    .border(
+                        width = 1.dp,
+                        color = inactiveTab.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .padding(8.dp),
                 contentAlignment = Alignment.BottomStart
             ) {
                 Text(
-                    text = uiState.morseBuffer,
+                    text = morseBuffer.ifEmpty { "... --- ..." },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
-                    color = if (uiState.isDarkMode) Color(0xFF3B82F6) else Color(0xFF0D9488),
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                    letterSpacing = 8.sp,
+                    color = if (morseBuffer.isEmpty()) secondaryText else accentColor,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 4.sp,
                     maxLines = 2
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(
-                        color = if (uiState.isDarkMode) Color(0xFF4B5563) else Color(0xFFD1D5DB),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(0.5.dp)
-                    )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 虚线分隔
+            DashedDivider(
+                color = inactiveTab,
+                modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 文本结果区域
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,10 +251,10 @@ private fun DisplayArea(uiState: kg.edu.yjut.morseinputmethod.viewmodel.Keyboard
                 contentAlignment = Alignment.BottomStart
             ) {
                 Text(
-                    text = uiState.textResult.ifEmpty { "输入莫尔斯码..." },
-                    fontSize = 24.sp,
+                    text = textResult.ifEmpty { "SOS" },
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (uiState.isDarkMode) Color.White else Color(0xFF1F2937),
+                    color = if (textResult.isEmpty()) secondaryText else textColor,
                     maxLines = 2
                 )
             }
@@ -203,7 +263,36 @@ private fun DisplayArea(uiState: kg.edu.yjut.morseinputmethod.viewmodel.Keyboard
 }
 
 @Composable
-private fun KeyboardArea(viewModel: MorseViewModel) {
+private fun DashedDivider(
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Canvas(
+        modifier = modifier
+            .height(1.dp)
+    ) {
+        val dashWidth = 6.dp.toPx()
+        val dashGap = 4.dp.toPx()
+        val strokeWidth = 1.dp.toPx()
+        var x = 0f
+        while (x < size.width) {
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(x, size.height / 2),
+                end = androidx.compose.ui.geometry.Offset(x + dashWidth, size.height / 2),
+                strokeWidth = strokeWidth
+            )
+            x += dashWidth + dashGap
+        }
+    }
+}
+
+@Composable
+private fun KeyboardArea(
+    viewModel: MorseViewModel,
+    accentColor: Color,
+    cardBg: Color
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     Column(
@@ -213,23 +302,34 @@ private fun KeyboardArea(viewModel: MorseViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         if (uiState.keyingMode == 0) {
-            ManualKeyMode(viewModel = viewModel)
+            ManualKeyMode(
+                viewModel = viewModel,
+                accentColor = accentColor,
+                cardBg = cardBg
+            )
         } else {
-            AutoKeyMode(viewModel = viewModel)
+            AutoKeyMode(
+                viewModel = viewModel,
+                accentColor = accentColor,
+                cardBg = cardBg
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // 模式切换栏
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(44.dp)
                 .background(
-                    color = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color(0xFFE5E7EB),
-                    shape = RoundedCornerShape(16.dp)
+                    color = cardBg,
+                    shape = RoundedCornerShape(22.dp)
                 )
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -239,22 +339,36 @@ private fun KeyboardArea(viewModel: MorseViewModel) {
                 fontWeight = FontWeight.Bold,
                 color = if (uiState.isDarkMode) Color.White else Color(0xFF1F2937)
             )
-            Icon(
-                imageVector = Icons.Filled.Circle,
-                contentDescription = "mode",
-                tint = if (uiState.isDarkMode) Color(0xFF3B82F6) else Color(0xFF0D9488),
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable { viewModel.toggleKeyingMode() }
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.clickable { viewModel.toggleKeyingMode() }
+            ) {
+                Text(
+                    text = "切换",
+                    fontSize = 12.sp,
+                    color = accentColor,
+                    fontWeight = FontWeight.Medium
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "switch mode",
+                    tint = accentColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ManualKeyMode(viewModel: MorseViewModel) {
+private fun ManualKeyMode(
+    viewModel: MorseViewModel,
+    accentColor: Color,
+    cardBg: Color
+) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     val scale by animateFloatAsState(
         targetValue = if (uiState.pressedKey == 1) 0.95f else 1f,
         animationSpec = tween(100),
@@ -263,24 +377,24 @@ private fun ManualKeyMode(viewModel: MorseViewModel) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // 拟物化发报键
         Box(
             modifier = Modifier
-                .size(130.dp)
+                .size(120.dp)
                 .scale(scale)
-                .clip(RoundedCornerShape(65.dp))
-                .background(
-                    color = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color.White
-                )
                 .graphicsLayer {
                     if (uiState.pressedKey == 1) {
                         shadowElevation = 0f
                     } else {
-                        shadowElevation = 8f
+                        shadowElevation = 12f
+                        shape = CircleShape
+                        clip = false
                     }
                 }
-                .clickable(enabled = uiState.inputEnabled) { }
+                .clip(CircleShape)
+                .background(cardBg)
                 .pointerInput(uiState.inputEnabled) {
                     detectTapGestures(
                         onPress = {
@@ -297,13 +411,14 @@ private fun ManualKeyMode(viewModel: MorseViewModel) {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                    imageVector = Icons.Filled.Circle,
-                    contentDescription = "morse key",
-                    tint = if (uiState.isDarkMode) Color(0xFF3B82F6) else Color(0xFF0D9488),
-                    modifier = Modifier.size(48.dp)
-                )
+                imageVector = Icons.Filled.RadioButtonChecked,
+                contentDescription = "morse key",
+                tint = accentColor,
+                modifier = Modifier.size(40.dp)
+            )
         }
 
+        // 提示文字
         Text(
             text = "长按为划 (-) 短按为点 (.)",
             fontSize = 10.sp,
@@ -312,15 +427,16 @@ private fun ManualKeyMode(viewModel: MorseViewModel) {
             letterSpacing = 2.sp
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
+        // 确认发送按钮
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .height(44.dp)
-                .padding(horizontal = 48.dp)
-                .clip(RoundedCornerShape(22.dp))
                 .background(
-                    color = if (uiState.isDarkMode) Color(0xFF3B82F6) else Color(0xFF0D9488)
+                    color = accentColor,
+                    shape = RoundedCornerShape(22.dp)
                 )
                 .clickable(enabled = uiState.inputEnabled) {
                     viewModel.confirmChar()
@@ -338,7 +454,11 @@ private fun ManualKeyMode(viewModel: MorseViewModel) {
 }
 
 @Composable
-private fun AutoKeyMode(viewModel: MorseViewModel) {
+private fun AutoKeyMode(
+    viewModel: MorseViewModel,
+    accentColor: Color,
+    cardBg: Color
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     val dotScale by animateFloatAsState(
@@ -357,9 +477,10 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(48.dp),
+            horizontalArrangement = Arrangement.spacedBy(40.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 点键
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -368,10 +489,13 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
                     modifier = Modifier
                         .size(100.dp)
                         .scale(dotScale)
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(
-                            color = if (uiState.isDarkMode) Color(0xFF2D1B1B) else Color(0xFFFEF2F2)
-                        )
+                        .graphicsLayer {
+                            shadowElevation = 8f
+                            shape = CircleShape
+                            clip = false
+                        }
+                        .clip(CircleShape)
+                        .background(cardBg)
                         .clickable(enabled = uiState.inputEnabled) {
                             viewModel.onDotClick()
                         },
@@ -380,7 +504,7 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
                     Box(
                         modifier = Modifier
                             .size(16.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(CircleShape)
                             .background(Color(0xFFEF4444))
                     )
                 }
@@ -392,13 +516,15 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
                 )
             }
 
+            // 中间分隔符
             Text(
                 text = "· −",
                 fontSize = 24.sp,
                 color = if (uiState.isDarkMode) Color(0xFF374151) else Color(0xFFE5E7EB),
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                fontFamily = FontFamily.Monospace
             )
 
+            // 划键
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -407,10 +533,13 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
                     modifier = Modifier
                         .size(100.dp)
                         .scale(dashScale)
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(
-                            color = if (uiState.isDarkMode) Color(0xFF1B2D3D) else Color(0xFFEFF6FF)
-                        )
+                        .graphicsLayer {
+                            shadowElevation = 8f
+                            shape = CircleShape
+                            clip = false
+                        }
+                        .clip(CircleShape)
+                        .background(cardBg)
                         .clickable(enabled = uiState.inputEnabled) {
                             viewModel.onDashClick()
                         },
@@ -418,10 +547,10 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
+                            .width(32.dp)
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(Color(0xFF3B82F6))
+                            .background(accentColor)
                     )
                 }
                 Text(
@@ -433,13 +562,14 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
             }
         }
 
+        // 确认发送按钮
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .height(44.dp)
-                .padding(horizontal = 48.dp)
-                .clip(RoundedCornerShape(22.dp))
                 .background(
-                    color = if (uiState.isDarkMode) Color(0xFF3B82F6) else Color(0xFF0D9488)
+                    color = accentColor,
+                    shape = RoundedCornerShape(22.dp)
                 )
                 .clickable(enabled = uiState.inputEnabled) {
                     viewModel.confirmChar()
@@ -457,7 +587,7 @@ private fun AutoKeyMode(viewModel: MorseViewModel) {
 }
 
 @Composable
-private fun InputDisabledOverlay(isVisible: Boolean) {
+private fun InputDisabledOverlay(isVisible: Boolean, cardBg: Color) {
     AnimatedVisibility(
         visible = isVisible,
         enter = fadeIn(animationSpec = tween(300)),
@@ -466,9 +596,9 @@ private fun InputDisabledOverlay(isVisible: Boolean) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp)
-                .background(Color(0xAA000000))
-                .clip(RoundedCornerShape(16.dp)),
+                .height(260.dp)
+                .background(Color(0xB3000000), shape = RoundedCornerShape(20.dp))
+                .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -476,7 +606,7 @@ private fun InputDisabledOverlay(isVisible: Boolean) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Circle,
+                    imageVector = Icons.Filled.RadioButtonChecked,
                     contentDescription = "disabled",
                     tint = Color.White.copy(alpha = 0.5f),
                     modifier = Modifier.size(48.dp)
@@ -498,9 +628,14 @@ private fun InputDisabledOverlay(isVisible: Boolean) {
 }
 
 @Composable
-private fun BottomFunctionKeys(viewModel: MorseViewModel, inputEnabled: Boolean) {
+private fun BottomFunctionKeys(
+    viewModel: MorseViewModel,
+    inputEnabled: Boolean,
+    cardBg: Color,
+    textColor: Color
+) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -508,13 +643,17 @@ private fun BottomFunctionKeys(viewModel: MorseViewModel, inputEnabled: Boolean)
             .height(56.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // 退格键
         Box(
             modifier = Modifier
                 .weight(1f)
+                .graphicsLayer {
+                    shadowElevation = 4f
+                    shape = RoundedCornerShape(16.dp)
+                    clip = false
+                }
                 .clip(RoundedCornerShape(16.dp))
-                .background(
-                    color = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color.White
-                )
+                .background(cardBg)
                 .clickable(enabled = inputEnabled) {
                     viewModel.onBackspace()
                 },
@@ -523,38 +662,46 @@ private fun BottomFunctionKeys(viewModel: MorseViewModel, inputEnabled: Boolean)
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Backspace,
                 contentDescription = "backspace",
-                tint = if (uiState.isDarkMode) Color.White else Color(0xFF1F2937),
+                tint = textColor,
                 modifier = Modifier.size(24.dp)
             )
         }
 
+        // 空格键
         Box(
             modifier = Modifier
                 .weight(1f)
+                .graphicsLayer {
+                    shadowElevation = 4f
+                    shape = RoundedCornerShape(16.dp)
+                    clip = false
+                }
                 .clip(RoundedCornerShape(16.dp))
-                .background(
-                    color = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color.White
-                )
+                .background(cardBg)
                 .clickable(enabled = inputEnabled) {
                     viewModel.addSpace()
                 },
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                    imageVector = Icons.Outlined.SpaceBar,
-                    contentDescription = "space",
-                    tint = if (uiState.isDarkMode) Color.White else Color(0xFF1F2937),
-                    modifier = Modifier.size(24.dp)
-                )
+                imageVector = Icons.Filled.SpaceBar,
+                contentDescription = "space",
+                tint = textColor,
+                modifier = Modifier.size(24.dp)
+            )
         }
 
+        // 清空键
         Box(
             modifier = Modifier
                 .weight(1f)
+                .graphicsLayer {
+                    shadowElevation = 4f
+                    shape = RoundedCornerShape(16.dp)
+                    clip = false
+                }
                 .clip(RoundedCornerShape(16.dp))
-                .background(
-                    color = if (uiState.isDarkMode) Color(0xFF1E1E1E) else Color.White
-                )
+                .background(cardBg)
                 .clickable(enabled = inputEnabled) {
                     viewModel.clearInput()
                 },
